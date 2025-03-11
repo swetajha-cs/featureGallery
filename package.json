@@ -1,0 +1,11 @@
+{
+  "name": "featuregallery",
+  "version": "1.0.0",
+  "main": "featureGallery.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sweta Jha",
+  "license": "ISC",
+  "description": ""
+}
