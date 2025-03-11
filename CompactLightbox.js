@@ -31,6 +31,8 @@ class CompactLightbox {
 
     // Add event listeners
     this.addListeners();
+
+    this.zoomLightbox();
   }
 
   injectStyles() {
@@ -86,7 +88,7 @@ class CompactLightbox {
         opacity: 1;
         top: 50%;
       }
-      .cl-lightbox {
+      .cl-lightbox-main {
         position: fixed;
         top: 0;
         left: 0;
@@ -105,6 +107,7 @@ class CompactLightbox {
         transform: translate(-50%, -50%);
         max-width: 90%;
         max-height: 90vh;
+        overflow: hidden;
       }
       .cl-image-container img {
         max-width: 100%;
@@ -162,6 +165,7 @@ class CompactLightbox {
       const img = document.createElement("img");
       img.src = image.src;
       img.alt = image.alt || "";
+      img.className = "zoomImage";
 
       const searchBtn = document.createElement("button");
       searchBtn.className = "cl-search-btn";
@@ -188,14 +192,47 @@ class CompactLightbox {
     this.options.container.appendChild(this.gallery);
   }
 
+  zoomLightbox(){
+    const img = document.querySelector('.cl-image-container'); // Selects the single element
+
+    img.addEventListener('mousemove', function (e) {
+      const { width, height, left, top } = img.getBoundingClientRect();
+      const x = ((e.clientX - left) / width) * 100;
+      const y = ((e.clientY - top) / height) * 100;
+      this.style.cursor = "zoom-in";
+    
+      const zoomImage = img.querySelector('.zoomImage'); // Target zoom image inside container
+      if (zoomImage) {
+        zoomImage.style.transformOrigin = `${x}% ${y}%`;
+        zoomImage.style.transform = "scale(2)";
+      }
+    });
+    
+    img.addEventListener('mouseleave', function () {
+      const zoomImage = img.querySelector('.zoomImage');
+      if (zoomImage) {
+        zoomImage.style.transform = "scale(1)";
+      }
+    });
+    
+    
+  }
+
   createLightbox() {
     // Main container
     this.lightbox = document.createElement("div");
-    this.lightbox.className = "cl-lightbox";
+    this.lightbox.className = "cl-lightbox-main";
+
+    this.lightboxinner = document.createElement("div");
+    this.lightboxinner.className = "cl-lightbox";
 
     // Image container
     this.imageContainer = document.createElement("div");
     this.imageContainer.className = "cl-image-container";
+
+    // Image thumbnail
+    this.imageThumbnail = document.createElement("div");
+    this.imageThumbnail.className = "cl-image-thumbnail";
 
     // Close button
     this.closeBtn = document.createElement("button");
@@ -206,7 +243,7 @@ class CompactLightbox {
     this.prevBtn = document.createElement("button");
     this.prevBtn.className = "cl-prev";
     this.prevBtn.innerHTML = `
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 18l-6-6 6-6" />
       </svg>
     `;
@@ -215,18 +252,21 @@ class CompactLightbox {
     this.nextBtn = document.createElement("button");
     this.nextBtn.className = "cl-next";
     this.nextBtn.innerHTML = `
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 18l6-6-6-6" />
       </svg>
     `;
 
     // Assemble lightbox
-    this.lightbox.appendChild(this.imageContainer);
+    this.lightbox.appendChild(this.lightboxinner);
+    this.lightboxinner.appendChild(this.imageContainer);
+    this.lightboxinner.appendChild(this.imageThumbnail);
     this.lightbox.appendChild(this.closeBtn);
     this.lightbox.appendChild(this.prevBtn);
     this.lightbox.appendChild(this.nextBtn);
     document.body.appendChild(this.lightbox);
-  }
+}
+
 
   addListeners() {
     // Close button
@@ -259,6 +299,7 @@ class CompactLightbox {
     const img = document.createElement("img");
     img.src = this.options.images[this.currentIndex].src;
     img.alt = this.options.images[this.currentIndex].alt || "";
+    img.className = "zoomImage";
 
     this.imageContainer.innerHTML = "";
     this.imageContainer.appendChild(img);
