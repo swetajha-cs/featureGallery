@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Compact Lightbox Example</title>
+  </head>
+  <body>
+    <div id="gallery-container">
+      <img src="pexels.jpg" alt="Image 1" width="200" class="lightbox-img" />
+      <img src="pixabay.jpg" alt="Image 2" width="200" class="lightbox-img" />
+      <img
+        src="istockphoto.jpg"
+        alt="Image 3"
+        width="200"
+        class="lightbox-img"
+      />
+    </div>
+
+    <script src="featureGallery.js"></script>
+    <script>
+      const imageElements = document.querySelectorAll(".lightbox-img");
+      const images = Array.from(imageElements).map((img) => ({
+        src: img.getAttribute("src"),
+        alt: img.getAttribute("alt")
+      }));
+      imageElements.forEach((img) => img.remove());
+      const myLightbox = new CompactLightbox({
+        container: document.getElementById("gallery-container"),
+        thumbnailSize: 200,
+        gap: 10,
+        fadeSpeed: 200,
+        images: images
+      });
+    </script>
+  </body>
+</html>
