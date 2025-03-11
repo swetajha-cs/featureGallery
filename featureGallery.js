@@ -145,6 +145,36 @@ class CompactLightbox {
       .cl-next {
         right: 15px;
       }
+      .cl-lightbox-thumbnails {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 10px;
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 80%;
+        overflow-x: auto;
+        padding: 5px;
+      }
+
+      .cl-lightbox-thumbnail {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: opacity 0.3s ease, border 0.3s ease;
+      }
+
+      .cl-lightbox-thumbnail:hover {
+        border: 2px solid white;
+      }
+
+      .cl-lightbox-thumbnail.selected {
+        opacity: 0.5;
+      }
     `;
 
     const style = document.createElement("style");
@@ -192,30 +222,28 @@ class CompactLightbox {
     this.options.container.appendChild(this.gallery);
   }
 
-  zoomLightbox(){
-    const img = document.querySelector('.cl-image-container'); // Selects the single element
+  zoomLightbox() {
+    const img = document.querySelector(".cl-image-container"); // Selects the single element
 
-    img.addEventListener('mousemove', function (e) {
+    img.addEventListener("mousemove", function (e) {
       const { width, height, left, top } = img.getBoundingClientRect();
       const x = ((e.clientX - left) / width) * 100;
       const y = ((e.clientY - top) / height) * 100;
       this.style.cursor = "zoom-in";
-    
-      const zoomImage = img.querySelector('.zoomImage'); // Target zoom image inside container
+
+      const zoomImage = img.querySelector(".zoomImage"); // Target zoom image inside container
       if (zoomImage) {
         zoomImage.style.transformOrigin = `${x}% ${y}%`;
         zoomImage.style.transform = "scale(2)";
       }
     });
-    
-    img.addEventListener('mouseleave', function () {
-      const zoomImage = img.querySelector('.zoomImage');
+
+    img.addEventListener("mouseleave", function () {
+      const zoomImage = img.querySelector(".zoomImage");
       if (zoomImage) {
         zoomImage.style.transform = "scale(1)";
       }
     });
-    
-    
   }
 
   createLightbox() {
@@ -265,8 +293,7 @@ class CompactLightbox {
     this.lightbox.appendChild(this.prevBtn);
     this.lightbox.appendChild(this.nextBtn);
     document.body.appendChild(this.lightbox);
-}
-
+  }
 
   addListeners() {
     // Close button
@@ -295,7 +322,7 @@ class CompactLightbox {
     this.currentIndex = index;
     this.isOpen = true;
 
-    // Create and load image
+    // Create and load main image
     const img = document.createElement("img");
     img.src = this.options.images[this.currentIndex].src;
     img.alt = this.options.images[this.currentIndex].alt || "";
@@ -304,7 +331,29 @@ class CompactLightbox {
     this.imageContainer.innerHTML = "";
     this.imageContainer.appendChild(img);
 
-    // Show with fade in
+    // Create the thumbnail container inside the lightbox if it doesn’t exist
+    if (!this.thumbnailContainer) {
+      this.thumbnailContainer = document.createElement("div");
+      this.thumbnailContainer.className = "cl-lightbox-thumbnails";
+      this.lightbox.appendChild(this.thumbnailContainer);
+    }
+
+    // Clear and add thumbnails inside the lightbox
+    this.thumbnailContainer.innerHTML = "";
+    this.options.images.forEach((image, i) => {
+      const thumb = document.createElement("img");
+      thumb.src = image.src;
+      thumb.alt = image.alt || "";
+      thumb.className = "cl-lightbox-thumbnail";
+      thumb.style.opacity = i === this.currentIndex ? "0.5" : "1";
+
+      // Clicking on a thumbnail updates the main image
+      thumb.addEventListener("click", () => this.show(i));
+
+      this.thumbnailContainer.appendChild(thumb);
+    });
+
+    // Show with fade-in effect
     this.lightbox.style.display = "block";
     setTimeout(() => {
       this.lightbox.style.opacity = "1";
