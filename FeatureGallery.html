@@ -5,25 +5,30 @@
   </head>
   <body>
     <div id="gallery-container">
-      <img src="pexels.jpg" alt="Image 1" class="gallery-image" />
-      <img src="pixabay.jpg" alt="Image 2" class="gallery-image" />
-      <img src="istockphoto.jpg" alt="Image 3" class="gallery-image" />
+      <img src="pexels.jpg" alt="Image 1" width="200" class="lightbox-img" />
+      <img src="pixabay.jpg" alt="Image 2" width="200" class="lightbox-img" />
+      <img
+        src="istockphoto.jpg"
+        alt="Image 3"
+        width="200"
+        class="lightbox-img"
+      />
     </div>
 
     <script src="featureGallery.js"></script>
     <script>
-      // Initialize with image elements from the HTML
+      const imageElements = document.querySelectorAll(".lightbox-img");
+      const images = Array.from(imageElements).map((img) => ({
+        src: img.getAttribute("src"),
+        alt: img.getAttribute("alt")
+      }));
+      imageElements.forEach((img) => img.remove());
       const myLightbox = new CompactLightbox({
         container: document.getElementById("gallery-container"),
         thumbnailSize: 200,
         gap: 10,
         fadeSpeed: 200,
-        images: Array.from(document.querySelectorAll(".gallery-image")).map(
-          (img) => ({
-            src: img.src,
-            alt: img.alt
-          })
-        )
+        images: images
       });
     </script>
   </body>
